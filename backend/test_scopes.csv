@@ -1,0 +1,4 @@
+S.No,Penetration Testing,Description,Key Deliverables,Key Dependencies,Est.testdate,Est.startdate,Timeline of testing,Timeline of remediation,Stake holder,Last tested year,Requirement statements,Impact of these tests
+4,Cloud Penetration Testing,Testing cloud infrastructure for security vulnerabilities,Cloud penetration test report,Cloud platform access and documentation,2024-06-15,2024-06-01,2 weeks,3 weeks,Cloud Team,2024-25,Cloud security compliance testing,HIGH
+5,IoT Device Testing,Testing IoT devices for security weaknesses,IoT security assessment report,IoT device access and specifications,2024-07-20,2024-07-01,3 weeks,4 weeks,IoT Team,2024-25,IoT device security assessment,CRITICAL
+6,Database Penetration Testing,Testing database security and access controls,Database security audit report,Database schemas and access credentials,2024-08-10,2024-08-01,1.5 weeks,2 weeks,Database Team,2024-25,Database security audit requirements,HIGH

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(django-admin startproject:*)",
+      "Bash(python manage.py startapp:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(python manage.py:*)",
+      "Bash(timeout:*)",
+      "Bash(python:*)",
+      "Bash(DJANGO_SETTINGS_MODULE=vapt_dashboard.settings python manage.py runserver 127.0.0.1:8001)",
+      "Bash(curl:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init:*)",
+      "Bash(npm exec:*)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
