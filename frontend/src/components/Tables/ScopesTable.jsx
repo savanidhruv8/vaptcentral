@@ -37,10 +37,10 @@ const ScopesTable = () => {
       label: 'Impact',
       render: (value) => {
         const colors = {
-          LOW: 'bg-green-100 text-green-800',
-          MEDIUM: 'bg-yellow-100 text-yellow-800',
-          HIGH: 'bg-orange-100 text-orange-800',
-          CRITICAL: 'bg-red-100 text-red-800',
+          LOW: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+          MEDIUM: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+          HIGH: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+          CRITICAL: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
         };
         return (
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[value] || 'bg-gray-100 text-gray-800'}`}>
@@ -60,7 +60,9 @@ const ScopesTable = () => {
       label: 'Last Tested',
       render: (value) => (
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-          value === '2024-25' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+          value === '2024-25' 
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+            : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
         }`}>
           {value || 'N/A'}
         </span>
@@ -100,15 +102,15 @@ const ScopesTable = () => {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white">Scopes</h2>
-        <p className="text-gray-400">Manage your testing scopes and definitions</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Scopes</h2>
+        <p className="text-gray-600 dark:text-gray-400">Manage your testing scopes and definitions</p>
       </div>
 
       {/* Filters */}
-      <div className="p-4 mb-6 bg-neutral-900 text-white rounded-lg border border-neutral-800">
+      <div className="p-4 mb-6 bg-white text-gray-900 dark:bg-neutral-900 dark:text-white rounded-lg border border-neutral-200 dark:border-neutral-800">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
               Impact
             </label>
             <select
@@ -124,7 +126,7 @@ const ScopesTable = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
               Year
             </label>
             <select
@@ -138,7 +140,7 @@ const ScopesTable = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
               Stakeholder
             </label>
             <input

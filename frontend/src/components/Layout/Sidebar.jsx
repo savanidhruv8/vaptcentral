@@ -1,42 +1,37 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '../../lib/utils';
+import { useTheme } from '../../context/ThemeContext';
 import {
-  ChartBarIcon,
-  DocumentArrowUpIcon,
-  TableCellsIcon,
+  ArrowUpTrayIcon,
+  ChartPieIcon,
+  ClipboardDocumentListIcon,
+  Squares2X2Icon,
+  BugAntIcon,
   Cog6ToothIcon,
   HomeIcon,
   SunIcon,
   MoonIcon
 } from '@heroicons/react/24/outline';
 
-const Sidebar = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
+const Sidebar = ({ activeTab, setActiveTab }) => {
   const [open, setOpen] = useState(false);
+  const { darkMode, toggleTheme } = useTheme();
 
   const navigation = [
-    { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
-    { id: 'upload', name: 'Upload Files', icon: DocumentArrowUpIcon },
-    { id: 'proposals', name: 'Proposals', icon: TableCellsIcon },
-    { id: 'scopes', name: 'Scopes', icon: TableCellsIcon },
-    { id: 'vulnerabilities', name: 'Vulnerabilities', icon: TableCellsIcon },
-    { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
+    { id: 'dashboard', name: 'Analytics', icon: HomeIcon },
+    { id: 'upload', name: 'Upload Files', icon: ArrowUpTrayIcon },
+    { id: 'proposals', name: 'Proposals', icon: ClipboardDocumentListIcon },
+    { id: 'scopes', name: 'Scopes', icon: Squares2X2Icon },
+    { id: 'vulnerabilities', name: 'Vulnerabilities', icon: BugAntIcon },
+    { id: 'analytics', name: 'Dashboard', icon: ChartPieIcon },
   ];
 
-  const toggleTheme = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    if (next) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    try { localStorage.setItem('darkMode', String(next)); } catch (_) {}
-  };
+  const onToggleClick = () => toggleTheme();
 
   return (
     <motion.div
-      className={cn('h-full px-2 py-4 hidden md:flex md:flex-col bg-black shrink-0')}
+      className={cn('h-full px-2 py-4 hidden md:flex md:flex-col bg-white dark:bg-black shrink-0')}
       animate={{ width: open ? '300px' : '60px' }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
@@ -44,9 +39,12 @@ const Sidebar = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         {open ? (
-          <h1 className="text-xl font-bold text-white">VAPT Dashboard</h1>
+          <div className="flex items-center gap-2">
+            <img src="/vapt-favicon.svg" alt="VAPT" className={cn('w-5 h-5')} />
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">VAPT Dashboard</h1>
+          </div>
         ) : (
-          <div className="w-6 h-6 rounded bg-neutral-800" aria-hidden="true"></div>
+          <img src="/vapt-favicon.svg" alt="VAPT" className={cn('w-6 h-6')} />
         )}
       </div>
 
@@ -64,8 +62,8 @@ const Sidebar = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
                 'w-full flex items-center rounded-lg text-sm transition-colors',
                 open ? 'gap-2 py-2 px-3 justify-start' : 'py-3 justify-center',
                 isActive
-                  ? 'bg-neutral-900 text-white'
-                  : 'text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-neutral-100 text-gray-900 dark:bg-neutral-900 dark:text-white'
+                  : 'text-gray-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900'
               )}
               title={!open ? item.name : undefined}
             >
@@ -80,9 +78,9 @@ const Sidebar = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
       <div className="pt-4 border-t border-neutral-800">
         <button
           type="button"
-          onClick={toggleTheme}
+          onClick={onToggleClick}
           className={cn(
-            'w-full flex items-center rounded-lg text-sm text-neutral-200 hover:bg-neutral-900',
+            'w-full flex items-center rounded-lg text-sm text-gray-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900',
             open ? 'gap-2 py-2 px-3 justify-start' : 'py-3 justify-center'
           )}
           title={!open ? (darkMode ? 'Light Mode' : 'Dark Mode') : undefined}
@@ -97,7 +95,7 @@ const Sidebar = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
         <button
           type="button"
           className={cn(
-            'mt-2 w-full flex items-center rounded-lg text-sm text-neutral-200 hover:bg-neutral-900',
+            'mt-2 w-full flex items-center rounded-lg text-sm text-gray-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-900',
             open ? 'gap-2 py-2 px-3 justify-start' : 'py-3 justify-center'
           )}
           title={!open ? 'Settings' : undefined}

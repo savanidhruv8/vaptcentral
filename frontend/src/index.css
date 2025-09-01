@@ -43,13 +43,13 @@
   @apply bg-gray-400 dark:bg-gray-500;
 }
 
-/* Base site-wide styling: force pure black background */
+/* Base site-wide styling: light by default, dark variant via .dark on html */
 html {
-  @apply bg-black;
+  @apply bg-white dark:bg-black;
 }
 
 body, #root {
-  @apply bg-black text-white;
+  @apply bg-white text-gray-900 dark:bg-black dark:text-white;
 }
 
 /* Card surface helper */

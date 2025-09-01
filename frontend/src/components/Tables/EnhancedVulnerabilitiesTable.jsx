@@ -129,20 +129,20 @@ const EnhancedVulnerabilitiesTable = () => {
   return (
     <div className="space-y-6">
       {/* Header and Controls */}
-      <div className="rounded-lg shadow-sm border p-6 bg-neutral-900 text-white border-neutral-800">
+      <div className="rounded-lg shadow-sm border p-6 bg-white text-gray-900 dark:bg-neutral-900 dark:text-white border-neutral-200 dark:border-neutral-800">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-white">
               Vulnerability Results
             </h2>
-            <p className="text-sm text-neutral-300">
+            <p className="text-sm text-gray-600 dark:text-neutral-300">
               {filteredVulns.length} of {vulnerabilities.length} vulnerabilities
             </p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-neutral-200 bg-neutral-800 border border-neutral-700 hover:bg-neutral-700"
+              className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-neutral-200 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700"
             >
               <FunnelIcon className="h-4 w-4 mr-2" />
               Filters
@@ -153,7 +153,7 @@ const EnhancedVulnerabilitiesTable = () => {
         {/* Search Bar */}
         <div className="mt-4">
           <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-neutral-400" />
             <input
               type="text"
               placeholder="Search vulnerabilities..."
@@ -202,37 +202,37 @@ const EnhancedVulnerabilitiesTable = () => {
       </div>
 
       {/* Table */}
-      <div className="rounded-lg shadow-sm border overflow-hidden bg-neutral-900 text-white border-neutral-800">
+      <div className="rounded-lg shadow-sm border overflow-hidden bg-white text-gray-900 dark:bg-neutral-900 dark:text-white border-neutral-200 dark:border-neutral-800">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-neutral-800">
-            <thead className="bg-neutral-800">
+          <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-800">
+            <thead className="bg-neutral-50 dark:bg-neutral-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
                   Vulnerability
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
                   Result
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
                   Criticality
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
                   Environment
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-neutral-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
                   Stakeholder
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-neutral-900 divide-y divide-neutral-800">
+            <tbody className="bg-white dark:bg-neutral-900 divide-y divide-neutral-200 dark:divide-neutral-800">
               {currentItems.map((vuln) => (
-                <tr key={vuln.id} className="hover:bg-neutral-800">
+                <tr key={vuln.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {vuln.vulnerability_id}
                       </div>
-                      <div className="text-sm text-neutral-300 max-w-xs truncate">
+                      <div className="text-sm text-gray-600 dark:text-neutral-300 max-w-xs truncate">
                         {vuln.vulnerability_name}
                       </div>
                     </div>
@@ -250,10 +250,10 @@ const EnhancedVulnerabilitiesTable = () => {
                       {vuln.cvss_criticality}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {vuln.tested_environment}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {vuln.stakeholders}
                   </td>
                 </tr>
@@ -263,9 +263,9 @@ const EnhancedVulnerabilitiesTable = () => {
         </div>
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-neutral-800 bg-neutral-900 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-neutral-300">Show</span>
+            <span className="text-sm text-gray-600 dark:text-neutral-300">Show</span>
             <select
               className="input-base rounded-md px-2 py-1 text-sm"
               value={itemsPerPage}
@@ -276,24 +276,24 @@ const EnhancedVulnerabilitiesTable = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span className="text-sm text-neutral-300">per page</span>
+            <span className="text-sm text-gray-600 dark:text-neutral-300">per page</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-neutral-300">
+            <span className="text-sm text-gray-600 dark:text-neutral-300">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-md border border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800"
+              className="p-2 rounded-md border border-neutral-300 dark:border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
               <ChevronLeftIcon className="h-4 w-4" />
             </button>
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-md border border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-800"
+              className="p-2 rounded-md border border-neutral-300 dark:border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
               <ChevronRightIcon className="h-4 w-4" />
             </button>

@@ -84,9 +84,9 @@ const FileUpload = ({ onUploadSuccess }) => {
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
           isDragOver
-            ? 'border-primary-400 bg-neutral-800'
-            : 'border-neutral-700 hover:border-neutral-500'
-        } bg-neutral-900 text-white`}
+            ? 'border-primary-400 bg-neutral-50 dark:bg-neutral-800'
+            : 'border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500'
+        } bg-white text-gray-900 dark:bg-neutral-900 dark:text-white`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -106,9 +106,9 @@ const FileUpload = ({ onUploadSuccess }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            <CloudArrowUpIcon className="h-16 w-16 text-neutral-400 mx-auto" />
+            <CloudArrowUpIcon className="h-16 w-16 text-gray-400 dark:text-neutral-400 mx-auto" />
             <div>
-              <p className="text-lg font-medium text-white">
+              <p className="text-lg font-medium text-gray-900 dark:text-white">
                 Drag and drop your Excel file here, or{' '}
                 <button
                   onClick={openFileSelector}
@@ -117,7 +117,7 @@ const FileUpload = ({ onUploadSuccess }) => {
                   click to browse
                 </button>
               </p>
-              <p className="text-sm text-neutral-400 mt-2">
+              <p className="text-sm text-gray-600 dark:text-neutral-400 mt-2">
                 Supports .xlsx, .xls, and .csv files (Max 50MB)
               </p>
             </div>

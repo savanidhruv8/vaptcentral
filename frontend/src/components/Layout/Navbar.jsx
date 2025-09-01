@@ -10,12 +10,12 @@ import {
 
 const Navbar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
+    { id: 'dashboard', name: 'Analytics', icon: HomeIcon },
     { id: 'upload', name: 'Upload Files', icon: CloudArrowUpIcon },
     { id: 'proposals', name: 'Proposals', icon: DocumentTextIcon },
     { id: 'scopes', name: 'Scopes', icon: ShieldCheckIcon },
     { id: 'vulnerabilities', name: 'Vulnerabilities', icon: ExclamationTriangleIcon },
-    { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
+    { id: 'analytics', name: 'Dashboard', icon: ChartBarIcon },
   ];
 
   return (
