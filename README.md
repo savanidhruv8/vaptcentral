@@ -8,7 +8,7 @@ A comprehensive full-stack web application for managing VAPT (Vulnerability Asse
 - **Location**: `./backend/`
 - **Technology**: Django 4.2.7 with DRF
 - **Features**: Excel processing, REST APIs, KPI calculations, Admin interface
-- **Server**: http://127.0.0.1:8001
+- **Server**: http://127.0.0.1
 
 ### ✅ Frontend (React with Vite)
 - **Location**: `./frontend/`
