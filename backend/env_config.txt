@@ -1,0 +1,24 @@
+# Django Settings
+DJANGO_SECRET_KEY=django-insecure-^q5^$$t_*^ky&joa!nuapfpm8h$vj!f1qh84dws^riuogr=1@!
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database (SQLite by default)
+DB_ENGINE=django.db.backends.sqlite3
+DB_NAME=db.sqlite3
+
+# Email Configuration (Required for user activation and password reset)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=dhruv29fake@gmail.com
+EMAIL_HOST_PASSWORD=cgsp ltwo bhdq dpth
+DEFAULT_FROM_EMAIL=dhruv29fake@gmail.com
+
+# Frontend URL (for email links)
+FRONTEND_URL=http://localhost:5173
+
+# CORS Settings
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173
+CORS_ALLOW_CREDENTIALS=True

@@ -1,6 +1,135 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+from django.core.mail import send_mail
+from django.conf import settings
+import uuid
+import secrets
+
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = [
+        ('super_admin', 'Super Admin'),
+        ('admin', 'Admin'),
+        ('general_user', 'General User'),
+    ]
+    
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    company_name = models.CharField(max_length=200, blank=True, null=True)
+    contact = models.CharField(max_length=20, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='general_user')
+    is_activated = models.BooleanField(default=False)
+    activation_token = models.UUIDField(default=uuid.uuid4, editable=False, null=True, blank=True)
+    activation_token_expires = models.DateTimeField(null=True, blank=True)
+    password_reset_token = models.CharField(max_length=100, blank=True, null=True)
+    password_reset_token_expires = models.DateTimeField(null=True, blank=True)
+    otp_code = models.CharField(max_length=6, blank=True, null=True)
+    otp_expires = models.DateTimeField(null=True, blank=True)
+    
+    # Override the related names to avoid conflicts
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+        related_name='customuser_set',
+        related_query_name='customuser',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name='customuser_set',
+        related_query_name='customuser',
+    )
+    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    
+    class Meta:
+        db_table = 'custom_user'
+    
+    def __str__(self):
+        return f"{self.email} ({self.role})"
+    
+    def is_super_admin(self):
+        return self.role == 'super_admin'
+    
+    def is_admin(self):
+        return self.role in ['super_admin', 'admin']
+    
+    def can_upload(self):
+        return self.role in ['super_admin', 'admin']
+    
+    def send_activation_email(self):
+        """Send activation email to user"""
+        activation_url = f"{settings.FRONTEND_URL}/activate/{self.activation_token}/"
+        subject = 'Activate Your VAPT Dashboard Account'
+        message = f"""
+        Hello {self.first_name},
+        
+        Welcome to VAPT Dashboard! Please click the link below to activate your account and set your password:
+        
+        {activation_url}
+        
+        This link will expire in 24 hours.
+        
+        Best regards,
+        VAPT Dashboard Team
+        """
+        
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [self.email],
+                fail_silently=False,
+            )
+            return True
+        except Exception as e:
+            print(f"Failed to send activation email: {e}")
+            return False
+    
+    def send_password_reset_email(self):
+        """Send password reset email with OTP"""
+        # Generate 6-digit OTP
+        self.otp_code = str(secrets.randbelow(900000) + 100000)
+        self.otp_expires = timezone.now() + timezone.timedelta(minutes=15)
+        self.save()
+        
+        subject = 'Password Reset - VAPT Dashboard'
+        message = f"""
+        Hello {self.first_name},
+        
+        You requested a password reset for your VAPT Dashboard account.
+        
+        Your OTP code is: {self.otp_code}
+        
+        This code will expire in 15 minutes.
+        
+        If you didn't request this, please ignore this email.
+        
+        Best regards,
+        VAPT Dashboard Team
+        """
+        
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [self.email],
+                fail_silently=False,
+            )
+            return True
+        except Exception as e:
+            print(f"Failed to send password reset email: {e}")
+            return False
 
 
 class ExcelUpload(models.Model):

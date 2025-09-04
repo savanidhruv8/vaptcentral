@@ -1,5 +1,116 @@
 from rest_framework import serializers
-from .models import ExcelUpload, Proposal, Scope, VaptResult, KPIMetrics
+from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
+from .models import CustomUser, ExcelUpload, Proposal, Scope, VaptResult, KPIMetrics
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name', 
+            'company_name', 'contact', 'role', 'is_active', 'is_activated',
+            'date_joined', 'last_login'
+        ]
+        read_only_fields = ['id', 'date_joined', 'last_login']
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+    
+    class Meta:
+        model = CustomUser
+        fields = [
+            'username', 'email', 'first_name', 'last_name', 
+            'company_name', 'contact', 'role', 'password'
+        ]
+    
+    def validate(self, attrs):
+        # Auto-generate username if not provided
+        email = attrs.get('email')
+        username = attrs.get('username')
+        if not username and email:
+            base_username = email.split('@')[0]
+            candidate_username = base_username
+            suffix = 1
+            # Ensure uniqueness
+            while CustomUser.objects.filter(username=candidate_username).exists():
+                candidate_username = f"{base_username}{suffix}"
+                suffix += 1
+            attrs['username'] = candidate_username
+        elif username:
+            # If provided username collides, derive a unique one based on it
+            if CustomUser.objects.filter(username=username).exists():
+                base_username = username
+                candidate_username = base_username
+                suffix = 1
+                while CustomUser.objects.filter(username=candidate_username).exists():
+                    candidate_username = f"{base_username}{suffix}"
+                    suffix += 1
+                attrs['username'] = candidate_username
+        return attrs
+
+    def create(self, validated_data):
+        # If no password is provided, generate a temporary one
+        if 'password' not in validated_data:
+            validated_data['password'] = CustomUser.objects.make_random_password()
+        
+        user = CustomUser.objects.create_user(**validated_data)
+        user.activation_token_expires = timezone.now() + timezone.timedelta(hours=24)
+        user.save()
+        return user
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+    
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+        
+        if email and password:
+            user = authenticate(username=email, password=password)
+            if not user:
+                raise serializers.ValidationError('Invalid email or password.')
+            if not user.is_active:
+                raise serializers.ValidationError('User account is disabled.')
+            if not user.is_activated:
+                raise serializers.ValidationError('Please activate your account first.')
+            attrs['user'] = user
+            return attrs
+        else:
+            raise serializers.ValidationError('Must include email and password.')
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class OTPVerifySerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    new_password = serializers.CharField(validators=[validate_password])
+    confirm_password = serializers.CharField()
+    
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError("Passwords don't match.")
+        return attrs
+
+
+class AccountActivationSerializer(serializers.Serializer):
+    password = serializers.CharField(validators=[validate_password])
+    confirm_password = serializers.CharField()
+    
+    def validate(self, attrs):
+        if attrs['password'] != attrs['confirm_password']:
+            raise serializers.ValidationError("Passwords don't match.")
+        return attrs
 
 
 class ExcelUploadSerializer(serializers.ModelSerializer):

@@ -14,13 +14,14 @@ const Layout = ({ children, activeTab, setActiveTab }) => {
         {/* Top Header */}
         <header className="bg-white dark:bg-black shadow-sm border-b border-neutral-200 dark:border-neutral-800">
           <div className="px-6 py-4">
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
               {activeTab === 'dashboard' && 'Analytics Overview'}
               {activeTab === 'upload' && 'File Upload'}
               {activeTab === 'proposals' && 'VAPT Proposals'}
               {activeTab === 'scopes' && 'Testing Scopes'}
               {activeTab === 'vulnerabilities' && 'Vulnerability Results'}
               {activeTab === 'analytics' && 'Dashboard'}
+              {activeTab === 'users' && 'User Management'}
             </h1>
           </div>
         </header>

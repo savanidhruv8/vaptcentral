@@ -9,11 +9,13 @@ import {
   ChartBarIcon,
   ChartPieIcon,
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../../context/AuthContext';
 import api, { getDashboardStats, resetDataset, getVulnerabilityAnalytics, getKpiMetrics, getTimelineAnalysis, getVaptResults } from '../../services/api';
 import StatCard from './StatCard';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, Label, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, Label, Cell, AreaChart, Area } from 'recharts';
 
 const DashboardStats = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -114,7 +116,17 @@ const DashboardStats = () => {
   }, [selectedEnvs, selectedCrits, selectedResults]);
 
 
+  // Check if user can reset data (admin or super admin)
+  const canResetData = () => {
+    return user && (user.role === 'admin' || user.role === 'super_admin');
+  };
+
   const handleReset = async () => {
+    if (!canResetData()) {
+      alert('You do not have permission to reset data. Only admin and super admin users can reset data.');
+      return;
+    }
+
     if (!window.confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
       return;
     }
@@ -130,7 +142,11 @@ const DashboardStats = () => {
       alert('Dataset reset successfully!');
     } catch (err) {
       console.error('Error resetting dataset:', err);
-      alert('Failed to reset dataset. Please try again.');
+      if (err.response?.status === 403) {
+        alert('You do not have permission to reset data. Only admin and super admin users can reset data.');
+      } else {
+        alert('Failed to reset dataset. Please try again.');
+      }
     } finally {
       setResetting(false);
     }
@@ -173,12 +189,16 @@ const DashboardStats = () => {
       setSelected(Array.from(next));
     };
     const clearAll = () => setSelected([]);
+    const selectAll = () => setSelected([...options]);
+    const isAllSelected = options.length > 0 && selected.length === options.length;
+    const isPartiallySelected = selected.length > 0 && selected.length < options.length;
+    
     return (
       <div className="relative inline-block text-left">
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800"
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800"
         >
           <span className="text-sm font-medium">{label}</span>
           {selected.length > 0 && (
@@ -190,6 +210,29 @@ const DashboardStats = () => {
         </button>
         {open && (
           <div className="absolute z-10 mt-2 w-64 origin-top-left rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg">
+            {/* Select All / Clear All header */}
+            <div className="px-2 py-2 border-b border-neutral-200 dark:border-neutral-800">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="rounded border-neutral-300 dark:border-neutral-700"
+                    checked={isAllSelected}
+                    ref={(input) => {
+                      if (input) input.indeterminate = isPartiallySelected;
+                    }}
+                    onChange={() => isAllSelected ? clearAll() : selectAll()}
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {isAllSelected ? 'Clear All' : 'Select All'}
+                  </span>
+                </label>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {selected.length}/{options.length}
+                </span>
+              </div>
+            </div>
+            
             <div className="max-h-64 overflow-auto p-2 space-y-1">
               {options.length === 0 ? (
                 <div className="px-2 py-1 text-sm text-neutral-500">No options</div>
@@ -394,14 +437,16 @@ const DashboardStats = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Overview</h2>
           <p className="text-gray-600 dark:text-gray-400">Monitor your VAPT activities and vulnerabilities</p>
         </div>
-        <button
-          onClick={handleReset}
-          disabled={resetting}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-        >
-          <ArrowPathIcon className={`h-4 w-4 mr-2 ${resetting ? 'animate-spin' : ''}`} />
-          {resetting ? 'Resetting...' : 'Reset Dataset'}
-        </button>
+        {canResetData() && (
+          <button
+            onClick={handleReset}
+            disabled={resetting}
+            className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          >
+            <ArrowPathIcon className={`h-4 w-4 mr-2 ${resetting ? 'animate-spin' : ''}`} />
+            {resetting ? 'Resetting...' : 'Reset Dataset'}
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
@@ -503,7 +548,7 @@ const DashboardStats = () => {
             <FilterDropdown label="Result" options={resultOptions} selected={selectedResults} setSelected={setSelectedResults} />
             <div className="flex items-center gap-2">
               <span className="text-sm">Cohort:</span>
-              <select className="input-base" value={selectedStakeholder} onChange={(e)=>setSelectedStakeholder(e.target.value)}>
+              <select className="input-base text-sm px-3 py-2" value={selectedStakeholder} onChange={(e)=>setSelectedStakeholder(e.target.value)}>
                 <option value="">Stakeholder (all)</option>
                 {stakeholderOptions.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -511,15 +556,15 @@ const DashboardStats = () => {
               </select>
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <button className="px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => { setSelectedEnvs([]); setSelectedCrits([]); setSelectedResults([]); }}>Clear All</button>
-              <button className="px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => {
+              <button className="px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => { setSelectedEnvs([]); setSelectedCrits([]); setSelectedResults([]); }}>Clear All</button>
+              <button className="px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => {
                 const name = prompt('Save current view as:');
                 if (!name) return;
                 const next = { ...savedViews, [name]: { env: selectedEnvs, crit: selectedCrits, res: selectedResults } };
                 setSavedViews(next);
                 try { localStorage.setItem('dashboardSavedViews', JSON.stringify(next)); } catch(_) {}
               }}>Save View</button>
-              <select className="input-base" onChange={(e) => {
+              <select className="input-base text-sm px-3 py-2" onChange={(e) => {
                 const key = e.target.value;
                 if (!key) return;
                 const v = savedViews[key];
@@ -533,7 +578,7 @@ const DashboardStats = () => {
                   <option key={k} value={k}>{k}</option>
                 ))}
               </select>
-              <button className="px-3 py-2 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => {
+              <button className="px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800" onClick={() => {
                 const key = prompt('Delete view name:');
                 if (!key || !savedViews[key]) return;
                 const next = { ...savedViews };
@@ -600,7 +645,19 @@ const DashboardStats = () => {
         <div className="p-6 bg-white text-gray-900 dark:bg-neutral-900 dark:text-white rounded-lg border border-neutral-200 dark:border-neutral-800">
           <h3 className="text-lg font-semibold mb-4">By Environment</h3>
           <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={envBarData} margin={{ top: 10, right: 30, left: 20, bottom: 20 }} onClick={handleEnvBarClick}>
+            <AreaChart data={envBarData} margin={{ top: 10, right: 30, left: 20, bottom: 20 }} onClick={handleEnvBarClick}>
+              <defs>
+                <linearGradient id="environmentGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                  <stop offset="50%" stopColor="#60a5fa" stopOpacity={0.6}/>
+                  <stop offset="100%" stopColor="#93c5fd" stopOpacity={0.3}/>
+                </linearGradient>
+                <linearGradient id="environmentStroke" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#1d4ed8"/>
+                  <stop offset="50%" stopColor="#3b82f6"/>
+                  <stop offset="100%" stopColor="#60a5fa"/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="name" interval={0} tick={{ fill: '#4b5563' }} />
               <YAxis allowDecimals={false} tick={{ fill: '#4b5563' }}>
@@ -608,8 +665,16 @@ const DashboardStats = () => {
               </YAxis>
               <Tooltip contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', color: '#111827' }} />
               <Legend />
-              <Bar dataKey="count" fill="#3b82f6" />
-            </BarChart>
+              <Area 
+                type="monotone" 
+                dataKey="count" 
+                stroke="url(#environmentStroke)" 
+                fill="url(#environmentGradient)" 
+                strokeWidth={3}
+                dot={{ fill: '#1d4ed8', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#1d4ed8', strokeWidth: 2, fill: '#ffffff' }}
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
@@ -655,7 +720,7 @@ const DashboardStats = () => {
               <h4 className="text-lg font-semibold">{modalTitle}</h4>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="px-3 py-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
               >
                 Close
               </button>

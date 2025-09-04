@@ -20,7 +20,8 @@ const EnhancedVulnerabilitiesTable = () => {
   // Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedResult, setSelectedResult] = useState('');
-  const [selectedCriticality, setSelectedCriticality] = useState('');
+  const [selectedCvssCriticality, setSelectedCvssCriticality] = useState('');
+  const [selectedBusinessCriticality, setSelectedBusinessCriticality] = useState('');
   const [selectedEnvironment, setSelectedEnvironment] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -30,7 +31,7 @@ const EnhancedVulnerabilitiesTable = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [vulnerabilities, searchTerm, selectedResult, selectedCriticality, selectedEnvironment]);
+  }, [vulnerabilities, searchTerm, selectedResult, selectedCvssCriticality, selectedBusinessCriticality, selectedEnvironment]);
 
   const fetchVulnerabilities = async () => {
     try {
@@ -62,9 +63,14 @@ const EnhancedVulnerabilitiesTable = () => {
       filtered = filtered.filter(vuln => vuln.result === selectedResult);
     }
 
-    // Criticality filter
-    if (selectedCriticality) {
-      filtered = filtered.filter(vuln => vuln.cvss_criticality === selectedCriticality);
+    // CVSS Criticality filter
+    if (selectedCvssCriticality) {
+      filtered = filtered.filter(vuln => vuln.cvss_criticality === selectedCvssCriticality);
+    }
+
+    // Business Criticality filter
+    if (selectedBusinessCriticality) {
+      filtered = filtered.filter(vuln => vuln.business_criticality === selectedBusinessCriticality);
     }
 
     // Environment filter
@@ -107,7 +113,8 @@ const EnhancedVulnerabilitiesTable = () => {
 
   // Get unique values for filters
   const uniqueResults = [...new Set(vulnerabilities.map(v => v.result))].filter(Boolean);
-  const uniqueCriticalities = [...new Set(vulnerabilities.map(v => v.cvss_criticality))].filter(Boolean);
+  const uniqueCvssCriticalities = [...new Set(vulnerabilities.map(v => v.cvss_criticality))].filter(Boolean);
+  const uniqueBusinessCriticalities = [...new Set(vulnerabilities.map(v => v.business_criticality))].filter(Boolean);
   const uniqueEnvironments = [...new Set(vulnerabilities.map(v => v.tested_environment))].filter(Boolean);
 
   if (loading) {
@@ -166,7 +173,7 @@ const EnhancedVulnerabilitiesTable = () => {
 
         {/* Filters */}
         {showFilters && (
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <select
               className="input-base px-3 py-2"
               value={selectedResult}
@@ -179,11 +186,21 @@ const EnhancedVulnerabilitiesTable = () => {
             </select>
             <select
               className="input-base px-3 py-2"
-              value={selectedCriticality}
-              onChange={(e) => setSelectedCriticality(e.target.value)}
+              value={selectedCvssCriticality}
+              onChange={(e) => setSelectedCvssCriticality(e.target.value)}
             >
-              <option value="">All Criticalities</option>
-              {uniqueCriticalities.map(crit => (
+              <option value="">All CVSS Criticalities</option>
+              {uniqueCvssCriticalities.map(crit => (
+                <option key={crit} value={crit}>{crit}</option>
+              ))}
+            </select>
+            <select
+              className="input-base px-3 py-2"
+              value={selectedBusinessCriticality}
+              onChange={(e) => setSelectedBusinessCriticality(e.target.value)}
+            >
+              <option value="">All Business Criticalities</option>
+              {uniqueBusinessCriticalities.map(crit => (
                 <option key={crit} value={crit}>{crit}</option>
               ))}
             </select>
@@ -214,7 +231,10 @@ const EnhancedVulnerabilitiesTable = () => {
                   Result
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
-                  Criticality
+                  Criticality based on CVSS score
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
+                  Criticality Based in Business Context
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-neutral-300 uppercase tracking-wider">
                   Environment
@@ -248,6 +268,14 @@ const EnhancedVulnerabilitiesTable = () => {
                       style={{ borderColor: getCriticalityColor(vuln.cvss_criticality), color: getCriticalityColor(vuln.cvss_criticality) }}
                     >
                       {vuln.cvss_criticality}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className="inline-flex px-2 py-1 text-xs font-semibold rounded-full border"
+                      style={{ borderColor: getCriticalityColor(vuln.business_criticality), color: getCriticalityColor(vuln.business_criticality) }}
+                    >
+                      {vuln.business_criticality || 'N/A'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
